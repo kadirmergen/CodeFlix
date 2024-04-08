@@ -75,23 +75,28 @@ namespace CodeFlix.Controllers
         // PUT: api/Episodes/5
         [HttpPut("{id}")]
         [Authorize(Roles = "Administrator, ContentAdmin")]
-        public ActionResult PutEpisode(long id, Episode episode)
+        public async Task<IActionResult> PutEpisode(long id, Episode episode)
         {
             Episode? episodeToUpdate = null;
-            if (episodeToUpdate == null)
-            {
-                return NotFound();
-            }
             if (id != episode.Id)
             {
                 return BadRequest();
             }
+
+            episodeToUpdate = _context.Episodes.Where(e => e.Id == episode.Id).FirstOrDefault();
+            if (episodeToUpdate == null)
+            {
+                return NotFound("Episode to update not found.");
+            }
             episodeToUpdate.Title = episode.Title;
             episodeToUpdate.Description = episode.Description;
             episodeToUpdate.SeasonNumber = episode.SeasonNumber;
+            episodeToUpdate.EpisodeNumber = episode.EpisodeNumber;
+            episodeToUpdate.Duration = episode.Duration;
+            episodeToUpdate.Passive = episode.Passive;
 
-            _context.Episodes.Update(episode);
-            _context.SaveChangesAsync();
+            //_context.Episodes.Update(episode);
+            await _context.SaveChangesAsync();
 
             return Ok();
         }
@@ -99,13 +104,27 @@ namespace CodeFlix.Controllers
         // POST: api/Episodes
         [HttpPost]
         [Authorize(Roles = "Administrator, ContentAdmin")]
-        public ActionResult<Episode> PostEpisode(Episode episode)
+        public async Task<ActionResult<Episode>> PostEpisode(Episode episode)
         {
             episode.ViewCount = 0;
-            _context.Episodes.Add(episode);
-            _context.SaveChangesAsync();
 
-            return Ok();
+            // Episode'nin MediaId'sine göre ilgili Media nesnesini bulun
+            var media = await _context.Medias.FindAsync(episode.MediaId);
+
+            // Eğer belirtilen MediaId'ye sahip bir medya bulunamazsa BadRequest döndürün
+            if (media == null)
+            {
+                return BadRequest("Belirtilen MediaId'ye sahip bir medya bulunamadı.");
+            }
+
+            // Episode'nin Media özelliğine ilgili Media nesnesini ata
+            episode.Media = media;
+
+            // Episode'yi veritabanına ekleyin
+            _context.Episodes.Add(episode);
+            await _context.SaveChangesAsync();
+
+            return Ok(episode);
         }
 
         // DELETE: api/Episodes/5

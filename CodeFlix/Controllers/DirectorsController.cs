@@ -47,15 +47,15 @@ namespace CodeFlix.Controllers
         // PUT: api/Directors/5
         [HttpPut("{id}")]
         [Authorize(Roles = "Administrator, ContentAdmin")]
-        public async Task<IActionResult> PutDirector(int id, Director director)
+        public ActionResult PutDirector(int id, Director director)
         {
             if (id != director.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(director).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            _context.Directors.Update(director);
+            _context.SaveChanges();
 
             return Ok("Director updated!");
         }
@@ -65,10 +65,8 @@ namespace CodeFlix.Controllers
         [Authorize(Roles = "Administrator, ContentAdmin")]
         public ActionResult PostDirector(Director director)
         {
-
             _context.Directors.Add(director);
             _context.SaveChanges();
-
             return Ok("Director added!");
         }
 

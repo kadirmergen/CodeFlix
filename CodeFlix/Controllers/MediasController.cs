@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using CodeFlix.Data;
 using CodeFlix.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.IO;
 
 namespace CodeFlix.Controllers
 {
@@ -35,7 +36,11 @@ namespace CodeFlix.Controllers
         [Authorize]
         public ActionResult<Media> GetMedia(int id)
         {
-            var media = _context.Medias.Where(m => m.Id == id).FirstOrDefault();
+            Media? media = _context.Medias.Find(id);
+
+            List<MediaCategory>? mediaCategory = _context.MediaCategories.Where(u => u.MediaId == id).Include(u => u.Category).ToList();
+            List<MediaDirector>? mediaDirector = _context.MediaDirectors.Where(d => d.MediaId == id).Include(d => d.Director).ToList();
+            List<MediaStar>? mediaStar = _context.MediaStars.Where(d => d.MediaId == id).Include(d => d.Star).ToList();
 
             if (media == null)
             {
@@ -44,7 +49,7 @@ namespace CodeFlix.Controllers
             return media;
         }
 
-        [HttpGet("{categoryId}")]
+        [HttpGet("category/{categoryId}")]
         [Authorize]
         public ActionResult<List<MediaCategory>> GetMediaCategory(short categoryId)
         {
@@ -77,18 +82,7 @@ namespace CodeFlix.Controllers
             
             return Ok("Media updated!");
         }
-
-        // POST: api/Medias
-        [HttpPost]
-        [Authorize(Roles = "Administrator, ContentAdmin")]
-        public ActionResult<Media> PostMedia(Media media)
-        {
-            _context.Medias.Add(media);
-            _context.SaveChanges();
-
-            return Ok();
-        }
-
+                
         // DELETE: api/Medias/5
         [HttpDelete("{id}")]
         [Authorize(Roles = "Administrator, ContentAdmin")]
@@ -105,5 +99,7 @@ namespace CodeFlix.Controllers
 
             return Ok("Media deleted.");
         }
+        
     }
+        
 }

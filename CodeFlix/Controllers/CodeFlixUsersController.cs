@@ -90,7 +90,6 @@ namespace CodeFlix.Controllers
         }
 
         // PUT: api/CodeFlixUsers/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         [Authorize]
         public ActionResult PutCodeFlixUser(CodeFlixUser codeFlixUser)

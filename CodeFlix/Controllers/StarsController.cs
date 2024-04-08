@@ -52,9 +52,8 @@ namespace CodeFlix.Controllers
             {
                 return BadRequest();
             }
-
-            _context.Entry(star).State = EntityState.Modified;
-            _context.SaveChangesAsync();
+            _context.Stars.Update(star);
+            _context.SaveChanges();
             
             return Ok();
         }

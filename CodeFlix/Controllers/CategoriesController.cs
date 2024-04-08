@@ -51,15 +51,7 @@ namespace CodeFlix.Controllers
         public void PutCategory(Category category) //return NoContent vardı. o zaman hiç birşey döndürmeyecektir. bu yüzden void yaptık.
         {
             _context.Categories.Update(category);
-
-            try
-            {
-                _context.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-            }
-
+            _context.SaveChanges();
         }
 
         // POST: api/Categories

@@ -21,7 +21,10 @@ namespace CodeFlix
             //  .AddEntityFrameworkStores<CodeFlixContext>();
             // builder.Services.AddIdentity<CodeFlixUser, IdentityRole>()
             //       .AddEntityFrameworkStores<CodeFlixContext>().AddDefaultTokenProviders();
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddNewtonsoftJson(opt =>
+            {
+                opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            }); ;
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddAuthentication();
             builder.Services.AddAuthorization();
